@@ -1,0 +1,154 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "oneOf": [
+                {
+                    "format": "http://json-schema.org/draft-03/schema"
+                }
+            ]
+        },
+        "type": {
+            "type": "string",
+            "oneOf": [
+                {
+                    "format": "object"
+                }
+            ]
+        },
+        "required": {
+            "type": "array",
+            "allOf": [
+                {
+                    "format": "name"
+                },
+                {
+                    "format": "parameters"
+                }
+            ]
+        },
+        "additionalProperties": {
+            "type": "boolean",
+            "oneOf": [
+                {
+                    "format": "false"
+                }
+            ]
+        },
+        "properties": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "oneOf": [
+                                {
+                                    "format": "string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "oneOf": [
+                                {
+                                    "format": "string"
+                                }
+                            ]
+                        },
+                        "properties": {
+                            "type": "object",
+                            "properties": {
+                                "platform": {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "oneOf": [
+                                                {
+                                                    "format": "string"
+                                                }
+                                            ]
+                                        },
+                                        "minLength": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "type",
+                                        "minLength"
+                                    ],
+                                    "additionalProperties": false
+                                },
+                                "timestamp": {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "oneOf": [
+                                                {
+                                                    "format": "string"
+                                                }
+                                            ]
+                                        },
+                                        "minLength": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "type"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            },
+                            "required": [
+                                "platform",
+                                "timestamp"
+                            ],
+                            "additionalProperties": true
+                        },
+                        "required": {
+                            "type": "array",
+                            "allOf": [
+                                {
+                                    "format": "platform"
+                                }
+                            ]
+                        },
+                        "additionalProperties": {
+                            "type": "boolean",
+                            "oneOf": [
+                                {
+                                    "format": "false"
+                                }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "properties",
+                        "required",
+                        "additionalProperties"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "$schema"
+    ],
+    "additionalProperties": false
+}

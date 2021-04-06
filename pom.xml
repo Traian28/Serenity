@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.ea.tnt</groupId>
+	<artifactId>serenity-parent</artifactId>
+	<version>2.0.2-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>${project.artifactId}</name>
+
+	<scm>
+		<connection>scm:git:ssh://git@stash.ea.com:7999/at/serenity.git</connection>
+		<tag>HEAD</tag>
+	</scm>
+
+	<modules>
+		<module>serenity-core</module>
+		<module>serenity-backend</module>
+		<module>serenity-frontend</module>
+	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.atlassian.maven.plugins</groupId>
+				<artifactId>maven-jgitflow-plugin</artifactId>
+				<version>1.0-alpha27</version>
+				<configuration>
+					<pushReleases>true</pushReleases>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>tntnexus</id>
+			<url>http://sonatypenexus.shared.ffx.eamythic.net:8081/nexus/content/groups/public</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>tntnexus</id>
+			<url>http://sonatypenexus.shared.ffx.eamythic.net:8081/nexus/content/groups/public</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>tntnexus</id>
+			<name>TNT Releases</name>
+			<url>http://sonatypenexus.shared.ffx.eamythic.net:8081/nexus/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>tntnexus</id>
+			<name>TNT Snapshots</name>
+			<url>http://sonatypenexus.shared.ffx.eamythic.net:8081/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+</project>

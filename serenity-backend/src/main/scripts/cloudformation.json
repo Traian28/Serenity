@@ -1,0 +1,100 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Cloud Formation for serenity backend",
+
+    "Parameters": {
+        "AccessKey" : {
+            "Description" : "Access Key for EC2 and S3 access",
+            "Type" : "String"
+        },
+        "SecretKey" : {
+            "Description" : "Secret Key for EC2 and S3 access",
+            "Type" : "String"
+        },
+        "InstanceType" : {
+            "Description" : "Instance Type",
+            "Type" : "String",
+            "Default" : "t1.micro",
+      		"AllowedValues" : ["t1.micro", "m1.small", "m1.medium", "m1.large"]
+        },
+        "InstanceName" : {
+            "Description" : "Instance Name",
+            "Type" : "String",
+            "Default" : "serenity-backend-dev-0-0-5"
+        },
+        "Environment" : {
+            "Description" : "Application Environment",
+            "Type" : "String",
+            "Default" : "dev",
+      		"AllowedValues" : ["dev", "int", "load", "stage", "prod"]
+        },
+        "Version" : {
+            "Description" : "Application version",
+            "Type" : "String"
+        }
+    },
+
+    "Resources" : {
+
+        "Ec2Instance" : {
+            "Type" : "AWS::EC2::Instance",
+            "Properties" : {
+                "SecurityGroups" : [ "tnt-web" ],
+                "KeyName" : "tnt-serenity",
+                "ImageId" : "ami-3275ee5b",
+                "InstanceType" : { "Ref" : "InstanceType" },
+                "Tags": [
+                    { "Key" : "Name", "Value": { "Ref" : "InstanceName" } }
+                ],
+                "UserData" : {
+                    "Fn::Base64" : {
+                        "Fn::Join" : [ "", [
+                            "#!/bin/bash -v\n",
+
+							"set -v \n",
+                			"set -x \n",
+                			"exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1\n",
+                
+                            "sudo su\n",
+
+                            "yum update -y aws-cfn-bootstrap\n",
+                            "yum install java-1.7.0-openjdk-devel.x86_64 -y \n",
+
+                            "cd /tmp\n",
+                            "wget https://raw.github.com/timkay/aws/master/aws\n",
+
+                            "echo ", { "Ref" : "AccessKey" }, " > ~/.awssecret\n",
+                            "echo ", { "Ref" : "SecretKey" }," >> ~/.awssecret\n",
+                            "chmod 600 ~/.awssecret\n",
+                            "perl /tmp/aws --install\n",
+
+                            "mkdir -p /opt/serenity-backend\n",
+                            "cd /opt/serenity-backend\n",
+                            
+                            "if [ \"", { "Ref" : "Environment" }, "\" == \"prod\" ] || [ \"", { "Ref" : "Environment" }, "\" == \"stage\" ]; then\n",
+							"aws get /tnt-build-release-prod/serenity-backend/", { "Ref" : "Environment" }, "/serenity-backend-", { "Ref" : "Version" }, "-jar-with-dependencies.jar /opt/serenity-backend/\n",
+                            "else \n",
+                            "aws get /tnt-build-release/serenity-backend/", { "Ref" : "Environment" }, "/serenity-backend-", { "Ref" : "Version" }, "-jar-with-dependencies.jar /opt/serenity-backend/\n",
+                            "fi \n",
+                            "/usr/bin/java7 -DentityExpansionLimit=0 -jar serenity-backend-", { "Ref" : "Version" }, "-jar-with-dependencies.jar 1>output.log 2>error.log &\n",
+                            "/opt/aws/bin/cfn-signal -e 0 -r \"Setup Complete\" '", { "Ref" : "InstanceWaitHandle" }, "'\n"
+                        ]]
+                    }
+                }
+            }
+        },
+
+        "InstanceWaitHandle" : {
+            "Type" : "AWS::CloudFormation::WaitConditionHandle"
+        },
+
+        "InstanceWaitCondition" : {
+            "Type" : "AWS::CloudFormation::WaitCondition",
+            "DependsOn" : "Ec2Instance",
+            "Properties" : {
+                "Handle" : { "Ref" : "InstanceWaitHandle" },
+                "Timeout" : "1200"
+            }
+        }
+    }
+}
